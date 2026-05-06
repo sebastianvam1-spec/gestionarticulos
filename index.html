@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gestión de Artículos</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <h1>Gestión de Artículos</h1>
+
+        <!-- CREAR -->
+
+        <div class="card">
+
+            <h2>Crear Artículo</h2>
+
+            <input type="text" id="nombre" placeholder="Nombre">
+            <input type="text" id="marca" placeholder="Marca">
+            <input type="number" id="cantidad" placeholder="Cantidad">
+            <input type="text" id="bodega" placeholder="Bodega">
+
+            <button onclick="crear()">Crear</button>
+
+            <p id="mensaje"></p>
+
+        </div>
+
+
+        <!-- EDITAR -->
+
+        <div class="card" id="seccionEditar" style="display:none;">
+
+            <h2>Editar Artículo</h2>
+
+            <input type="text" id="editarNombre" placeholder="Nombre">
+            <input type="text" id="editarMarca" placeholder="Marca">
+            <input type="number" id="editarCantidad" placeholder="Cantidad">
+            <input type="text" id="editarBodega" placeholder="Bodega">
+
+            <button onclick="actualizar()">Actualizar</button>
+            <button onclick="cancelarEdicion()">Cancelar</button>
+
+        </div>
+
+
+        <!-- TABLA -->
+
+        <div class="card">
+
+            <h2>Lista de Artículos</h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Marca</th>
+                        <th>Cantidad</th>
+                        <th>Bodega</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabla"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <script src="js/app.js"></script>
+
+</body>
+</html>
