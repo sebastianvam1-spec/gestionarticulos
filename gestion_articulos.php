@@ -16,7 +16,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 $host = "mysql-claseapi.alwaysdata.net";
 
-$db = "claseapi_gestion_articulos";
+$db = "api_inventarios";
 
 $user = "claseapi";
 
