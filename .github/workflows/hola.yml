@@ -1,29 +1,46 @@
-name: 🚀 Tarea de Despliegue
+name: 🚀 Deploy AlwaysData
 
 on:
-   push:
-     branches:
-       - main
+  push:
+    branches:
+      - main
 
 jobs:
+
   deploy:
-    name: 🎉 Trabajo de Despliegue
+  
+    name: 🎉 Desplegando Proyecto
+    
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🚚 Obteniendo el código más reciente
+
+      - name: 🚚 Clonando repositorio
         uses: actions/checkout@v4
 
-      - name: 📂 Sincronizando archivos via FTP
+
+      - name: 📂 Subiendo archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+
         with:
-          server: ftp-claseapi.alwaysdata.net # Change if using another host
+
+          server: ftp-repoclase.alwaysdata.net
+
           username: ${{ secrets.FTP_USERNAME }}
+
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: www/ # Replace with your correct path
+
+          server-dir: www/cliente1/
+
           protocol: ftps
-          timeout: 86400000
+
+          timeout: 600000
+
           log-level: standard
+
           exclude: |
-           .git/**
-           .github/**
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .github/**
+            README.md
