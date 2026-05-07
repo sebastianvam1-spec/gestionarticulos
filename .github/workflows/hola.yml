@@ -24,7 +24,7 @@ jobs:
 
         with:
 
-          server: ftp-repoclase.alwaysdata.net
+          server: ftp-claseapi.alwaysdata.net
 
           username: ${{ secrets.FTP_USERNAME }}
 
