@@ -1,107 +1,168 @@
 <?php
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 header("Content-Type: application/json");
 
-$host = "mysql-claseapi.alwaysdata.net";
-$db   = "claseapi_gestion_articulos";
-$user = "claseapi";
-$pass = "clase1234";
+$conexion = new mysqli(
+    "mysql-claseapi.alwaysdata.net",
+    "claseapi",
+    "clase1234",
+    "claseapi_gestion_articulos"
+);
 
-try {
-
-    $pdo = new PDO(
-        "mysql:host=$host;dbname=$db;charset=utf8",
-        $user,
-        $pass
-    );
-
-    $pdo->setAttribute(
-        PDO::ATTR_ERRMODE,
-        PDO::ERRMODE_EXCEPTION
-    );
-
-} catch(PDOException $e) {
+if ($conexion->connect_error) {
 
     die(json_encode([
-        "conexion_error" => $e->getMessage()
+        "error" => $conexion->connect_error
     ]));
 }
 
 
-/* ======================
-   TEST SIMPLE
-====================== */
-
 $method = $_SERVER['REQUEST_METHOD'];
 
-if($method == "GET") {
 
-    try {
+/* ==========================
+   OBTENER
+========================== */
 
-        $sql = "SELECT * FROM articulos";
+if ($method == "GET") {
 
-        $stmt = $pdo->query($sql);
+    $sql = "SELECT * FROM articulos";
 
-        $datos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $resultado = $conexion->query($sql);
 
-        echo json_encode($datos);
+    $datos = [];
 
-    } catch(PDOException $e) {
+    while($fila = $resultado->fetch_assoc()) {
 
-        echo json_encode([
-            "select_error" => $e->getMessage()
-        ]);
+        $datos[] = $fila;
     }
+
+    echo json_encode($datos);
 }
 
 
-if($method == "POST") {
+/* ==========================
+   CREAR
+========================== */
+
+if ($method == "POST") {
 
     $data = json_decode(
         file_get_contents("php://input"),
         true
     );
 
-    try {
+    $nombre = $data["nombre"];
+    $marca = $data["marca"];
+    $cantidad = intval($data["cantidad"]);
+    $bodega = $data["bodega"];
 
-        $sql = "
-            INSERT INTO articulos
-            (
-                nombre,
-                marca,
-                cantidad,
-                bodega
-            )
-            VALUES
-            (
-                ?, ?, ?, ?
-            )
-        ";
 
-        $stmt = $pdo->prepare($sql);
+    $sql = "
+        INSERT INTO articulos
+        (
+            nombre,
+            marca,
+            cantidad,
+            bodega
+        )
+        VALUES
+        (
+            '$nombre',
+            '$marca',
+            $cantidad,
+            '$bodega'
+        )
+    ";
 
-        $stmt->execute([
-
-            $data["nombre"],
-
-            $data["marca"],
-
-            intval($data["cantidad"]),
-
-            $data["bodega"]
-        ]);
+    if($conexion->query($sql)) {
 
         echo json_encode([
             "success" => true
         ]);
 
-    } catch(PDOException $e) {
+    } else {
 
         echo json_encode([
-            "insert_error" => $e->getMessage()
+            "error" => $conexion->error
+        ]);
+    }
+}
+
+
+/* ==========================
+   ELIMINAR
+========================== */
+
+if ($method == "DELETE") {
+
+    $id = $_GET["id"];
+
+    $sql = "
+        DELETE FROM articulos
+        WHERE id = $id
+    ";
+
+    if($conexion->query($sql)) {
+
+        echo json_encode([
+            "success" => true
+        ]);
+
+    } else {
+
+        echo json_encode([
+            "error" => $conexion->error
+        ]);
+    }
+}
+
+
+/* ==========================
+   ACTUALIZAR
+========================== */
+
+if ($method == "PUT") {
+
+    $id = $_GET["id"];
+
+    $data = json_decode(
+        file_get_contents("php://input"),
+        true
+    );
+
+    $nombre = $data["nombre"];
+    $marca = $data["marca"];
+    $cantidad = intval($data["cantidad"]);
+    $bodega = $data["bodega"];
+
+
+    $sql = "
+        UPDATE articulos
+        SET
+
+        nombre='$nombre',
+
+        marca='$marca',
+
+        cantidad=$cantidad,
+
+        bodega='$bodega'
+
+        WHERE id=$id
+    ";
+
+
+    if($conexion->query($sql)) {
+
+        echo json_encode([
+            "success" => true
+        ]);
+
+    } else {
+
+        echo json_encode([
+            "error" => $conexion->error
         ]);
     }
 }
