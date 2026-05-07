@@ -1,12 +1,11 @@
-const API_URL =
-"https://claseapi.alwaysdata.net/cliente1/gestion_articulos.php";
+const API_URL = "gestion_articulos.php";
 
 let editandoId = null;
 
 
-/* =========================
+/* =====================================
    MOSTRAR MENSAJES
-========================= */
+===================================== */
 
 function mostrarMensaje(texto, color = "red") {
 
@@ -18,19 +17,15 @@ function mostrarMensaje(texto, color = "red") {
 }
 
 
-/* =========================
+/* =====================================
    CARGAR ARTÍCULOS
-========================= */
+===================================== */
 
 async function cargar() {
 
     try {
 
         const response = await fetch(API_URL);
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
 
         const data = await response.json();
 
@@ -67,27 +62,30 @@ async function cargar() {
 
     } catch (error) {
 
-        console.error(error);
+        console.log(error);
 
         mostrarMensaje(
-            "Error al cargar artículos",
-            "red"
+            "Error al cargar artículos"
         );
     }
 }
 
 
-/* =========================
+/* =====================================
    VALIDAR FORMULARIO
-========================= */
+===================================== */
 
 function validar(nombre, marca, cantidad, bodega) {
 
-    if (!nombre || !marca || !cantidad || !bodega) {
+    if (
+        !nombre ||
+        !marca ||
+        !cantidad ||
+        !bodega
+    ) {
 
         mostrarMensaje(
-            "Todos los campos son obligatorios",
-            "red"
+            "Todos los campos son obligatorios"
         );
 
         return false;
@@ -96,8 +94,7 @@ function validar(nombre, marca, cantidad, bodega) {
     if (parseInt(cantidad) < 0) {
 
         mostrarMensaje(
-            "Cantidad inválida",
-            "red"
+            "Cantidad inválida"
         );
 
         return false;
@@ -107,22 +104,25 @@ function validar(nombre, marca, cantidad, bodega) {
 }
 
 
-/* =========================
+/* =====================================
    LIMPIAR FORMULARIO
-========================= */
+===================================== */
 
 function limpiar() {
 
     document.getElementById("nombre").value = "";
+
     document.getElementById("marca").value = "";
+
     document.getElementById("cantidad").value = "";
+
     document.getElementById("bodega").value = "";
 }
 
 
-/* =========================
+/* =====================================
    CREAR ARTÍCULO
-========================= */
+===================================== */
 
 async function crear() {
 
@@ -139,7 +139,14 @@ async function crear() {
         document.getElementById("bodega").value.trim();
 
 
-    if (!validar(nombre, marca, cantidad, bodega)) {
+    if (
+        !validar(
+            nombre,
+            marca,
+            cantidad,
+            bodega
+        )
+    ) {
         return;
     }
 
@@ -167,12 +174,11 @@ async function crear() {
 
         const data = await response.json();
 
-        if (!response.ok) {
+        console.log(data);
 
-            mostrarMensaje(
-                data.error || "Error al crear artículo",
-                "red"
-            );
+        if (data.error) {
+
+            mostrarMensaje(data.error);
 
             return;
         }
@@ -188,19 +194,18 @@ async function crear() {
 
     } catch (error) {
 
-        console.error(error);
+        console.log(error);
 
         mostrarMensaje(
-            "Error de conexión",
-            "red"
+            "Error al crear artículo"
         );
     }
 }
 
 
-/* =========================
+/* =====================================
    EDITAR ARTÍCULO
-========================= */
+===================================== */
 
 async function editar(id) {
 
@@ -211,17 +216,21 @@ async function editar(id) {
 
         const a = await response.json();
 
-        document.getElementById("editarNombre").value =
-            a.nombre;
+        document.getElementById(
+            "editarNombre"
+        ).value = a.nombre;
 
-        document.getElementById("editarMarca").value =
-            a.marca;
+        document.getElementById(
+            "editarMarca"
+        ).value = a.marca;
 
-        document.getElementById("editarCantidad").value =
-            a.cantidad;
+        document.getElementById(
+            "editarCantidad"
+        ).value = a.cantidad;
 
-        document.getElementById("editarBodega").value =
-            a.bodega;
+        document.getElementById(
+            "editarBodega"
+        ).value = a.bodega;
 
         editandoId = id;
 
@@ -231,38 +240,41 @@ async function editar(id) {
 
     } catch (error) {
 
-        console.error(error);
+        console.log(error);
 
         mostrarMensaje(
-            "Error al cargar artículo",
-            "red"
+            "Error al cargar artículo"
         );
     }
 }
 
 
-/* =========================
-   ACTUALIZAR ARTÍCULO
-========================= */
+/* =====================================
+   ACTUALIZAR
+===================================== */
 
 async function actualizar() {
 
     const nombre =
-        document.getElementById("editarNombre").value.trim();
+        document.getElementById(
+            "editarNombre"
+        ).value.trim();
 
     const marca =
-        document.getElementById("editarMarca").value.trim();
+        document.getElementById(
+            "editarMarca"
+        ).value.trim();
 
     const cantidad =
-        document.getElementById("editarCantidad").value.trim();
+        document.getElementById(
+            "editarCantidad"
+        ).value.trim();
 
     const bodega =
-        document.getElementById("editarBodega").value.trim();
+        document.getElementById(
+            "editarBodega"
+        ).value.trim();
 
-
-    if (!validar(nombre, marca, cantidad, bodega)) {
-        return;
-    }
 
     try {
 
@@ -291,18 +303,10 @@ async function actualizar() {
 
         const data = await response.json();
 
-        if (!response.ok) {
-
-            mostrarMensaje(
-                data.error || "Error al actualizar",
-                "red"
-            );
-
-            return;
-        }
+        console.log(data);
 
         mostrarMensaje(
-            "Artículo actualizado correctamente",
+            "Artículo actualizado",
             "green"
         );
 
@@ -312,19 +316,18 @@ async function actualizar() {
 
     } catch (error) {
 
-        console.error(error);
+        console.log(error);
 
         mostrarMensaje(
-            "Error de conexión",
-            "red"
+            "Error al actualizar"
         );
     }
 }
 
 
-/* =========================
+/* =====================================
    CANCELAR EDICIÓN
-========================= */
+===================================== */
 
 function cancelarEdicion() {
 
@@ -336,13 +339,17 @@ function cancelarEdicion() {
 }
 
 
-/* =========================
-   ELIMINAR ARTÍCULO
-========================= */
+/* =====================================
+   ELIMINAR
+===================================== */
 
 async function eliminar(id) {
 
-    if (!confirm("¿Deseas eliminar este artículo?")) {
+    if (
+        !confirm(
+            "¿Eliminar artículo?"
+        )
+    ) {
         return;
     }
 
@@ -357,18 +364,10 @@ async function eliminar(id) {
 
         const data = await response.json();
 
-        if (!response.ok) {
-
-            mostrarMensaje(
-                data.error || "Error al eliminar",
-                "red"
-            );
-
-            return;
-        }
+        console.log(data);
 
         mostrarMensaje(
-            "Artículo eliminado correctamente",
+            "Artículo eliminado",
             "green"
         );
 
@@ -376,18 +375,17 @@ async function eliminar(id) {
 
     } catch (error) {
 
-        console.error(error);
+        console.log(error);
 
         mostrarMensaje(
-            "Error de conexión",
-            "red"
+            "Error al eliminar"
         );
     }
 }
 
 
-/* =========================
+/* =====================================
    INICIAR APP
-========================= */
+===================================== */
 
 cargar();
