@@ -3,11 +3,16 @@
 header("Content-Type: application/json");
 
 $conexion = new mysqli(
+
     "mysql-claseapi.alwaysdata.net",
+
     "claseapi",
+
     "clase1234",
+
     "claseapi_gestion_articulos"
 );
+
 
 if ($conexion->connect_error) {
 
@@ -20,30 +25,53 @@ if ($conexion->connect_error) {
 $method = $_SERVER['REQUEST_METHOD'];
 
 
-/* ==========================
-   OBTENER
-========================== */
+/* =========================
+   GET
+========================= */
 
 if ($method == "GET") {
 
-    $sql = "SELECT * FROM articulos";
+    if(isset($_GET["id"])) {
 
-    $resultado = $conexion->query($sql);
+        $id = $_GET["id"];
 
-    $datos = [];
+        $sql = "
+            SELECT *
+            FROM articulos
+            WHERE id = $id
+        ";
 
-    while($fila = $resultado->fetch_assoc()) {
+        $resultado =
+            $conexion->query($sql);
 
-        $datos[] = $fila;
+        echo json_encode(
+            $resultado->fetch_assoc()
+        );
+
+    } else {
+
+        $sql =
+            "SELECT * FROM articulos";
+
+        $resultado =
+            $conexion->query($sql);
+
+        $datos = [];
+
+        while($fila =
+            $resultado->fetch_assoc()) {
+
+            $datos[] = $fila;
+        }
+
+        echo json_encode($datos);
     }
-
-    echo json_encode($datos);
 }
 
 
-/* ==========================
-   CREAR
-========================== */
+/* =========================
+   POST
+========================= */
 
 if ($method == "POST") {
 
@@ -53,8 +81,12 @@ if ($method == "POST") {
     );
 
     $nombre = $data["nombre"];
+
     $marca = $data["marca"];
-    $cantidad = intval($data["cantidad"]);
+
+    $cantidad =
+        intval($data["cantidad"]);
+
     $bodega = $data["bodega"];
 
 
@@ -66,7 +98,9 @@ if ($method == "POST") {
             cantidad,
             bodega
         )
+
         VALUES
+
         (
             '$nombre',
             '$marca',
@@ -90,17 +124,43 @@ if ($method == "POST") {
 }
 
 
-/* ==========================
-   ELIMINAR
-========================== */
+/* =========================
+   PUT
+========================= */
 
-if ($method == "DELETE") {
+if ($method == "PUT") {
 
     $id = $_GET["id"];
 
+    $data = json_decode(
+        file_get_contents("php://input"),
+        true
+    );
+
+    $nombre = $data["nombre"];
+
+    $marca = $data["marca"];
+
+    $cantidad =
+        intval($data["cantidad"]);
+
+    $bodega = $data["bodega"];
+
+
     $sql = "
-        DELETE FROM articulos
-        WHERE id = $id
+        UPDATE articulos
+
+        SET
+
+        nombre='$nombre',
+
+        marca='$marca',
+
+        cantidad=$cantidad,
+
+        bodega='$bodega'
+
+        WHERE id=$id
     ";
 
     if($conexion->query($sql)) {
@@ -118,40 +178,18 @@ if ($method == "DELETE") {
 }
 
 
-/* ==========================
-   ACTUALIZAR
-========================== */
+/* =========================
+   DELETE
+========================= */
 
-if ($method == "PUT") {
+if ($method == "DELETE") {
 
     $id = $_GET["id"];
 
-    $data = json_decode(
-        file_get_contents("php://input"),
-        true
-    );
-
-    $nombre = $data["nombre"];
-    $marca = $data["marca"];
-    $cantidad = intval($data["cantidad"]);
-    $bodega = $data["bodega"];
-
-
     $sql = "
-        UPDATE articulos
-        SET
-
-        nombre='$nombre',
-
-        marca='$marca',
-
-        cantidad=$cantidad,
-
-        bodega='$bodega'
-
-        WHERE id=$id
+        DELETE FROM articulos
+        WHERE id = $id
     ";
-
 
     if($conexion->query($sql)) {
 

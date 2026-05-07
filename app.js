@@ -3,13 +3,14 @@ const API_URL = "gestion_articulos.php";
 let editandoId = null;
 
 
-/* =====================================
-   MOSTRAR MENSAJES
-===================================== */
+/* =========================
+   MENSAJES
+========================= */
 
 function mostrarMensaje(texto, color = "red") {
 
-    const mensaje = document.getElementById("mensaje");
+    const mensaje =
+        document.getElementById("mensaje");
 
     mensaje.innerText = texto;
 
@@ -17,19 +18,22 @@ function mostrarMensaje(texto, color = "red") {
 }
 
 
-/* =====================================
-   CARGAR ARTÍCULOS
-===================================== */
+/* =========================
+   CARGAR DATOS
+========================= */
 
 async function cargar() {
 
     try {
 
-        const response = await fetch(API_URL);
+        const response =
+            await fetch(API_URL);
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
-        const tabla = document.getElementById("tabla");
+        const tabla =
+            document.getElementById("tabla");
 
         tabla.innerHTML = "";
 
@@ -60,7 +64,7 @@ async function cargar() {
             `;
         });
 
-    } catch (error) {
+    } catch(error) {
 
         console.log(error);
 
@@ -71,42 +75,77 @@ async function cargar() {
 }
 
 
-/* =====================================
-   VALIDAR FORMULARIO
-===================================== */
+/* =========================
+   CREAR
+========================= */
 
-function validar(nombre, marca, cantidad, bodega) {
+async function crear() {
 
-    if (
-        !nombre ||
-        !marca ||
-        !cantidad ||
-        !bodega
-    ) {
+    const nombre =
+        document.getElementById("nombre").value;
+
+    const marca =
+        document.getElementById("marca").value;
+
+    const cantidad =
+        document.getElementById("cantidad").value;
+
+    const bodega =
+        document.getElementById("bodega").value;
+
+
+    try {
+
+        const response =
+            await fetch(API_URL, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    nombre: nombre,
+
+                    marca: marca,
+
+                    cantidad: parseInt(cantidad),
+
+                    bodega: bodega
+                })
+            });
+
+        const data =
+            await response.json();
+
+        console.log(data);
 
         mostrarMensaje(
-            "Todos los campos son obligatorios"
+            "Artículo creado",
+            "green"
         );
 
-        return false;
-    }
+        limpiar();
 
-    if (parseInt(cantidad) < 0) {
+        cargar();
+
+    } catch(error) {
+
+        console.log(error);
 
         mostrarMensaje(
-            "Cantidad inválida"
+            "Error al crear"
         );
-
-        return false;
     }
-
-    return true;
 }
 
 
-/* =====================================
-   LIMPIAR FORMULARIO
-===================================== */
+/* =========================
+   LIMPIAR
+========================= */
 
 function limpiar() {
 
@@ -120,44 +159,78 @@ function limpiar() {
 }
 
 
-/* =====================================
-   CREAR ARTÍCULO
-===================================== */
+/* =========================
+   EDITAR
+========================= */
 
-async function crear() {
+async function editar(id) {
+
+    const response =
+        await fetch(`${API_URL}?id=${id}`);
+
+    const a =
+        await response.json();
+
+    document.getElementById(
+        "editarNombre"
+    ).value = a.nombre;
+
+    document.getElementById(
+        "editarMarca"
+    ).value = a.marca;
+
+    document.getElementById(
+        "editarCantidad"
+    ).value = a.cantidad;
+
+    document.getElementById(
+        "editarBodega"
+    ).value = a.bodega;
+
+    editandoId = id;
+
+    document.getElementById(
+        "seccionEditar"
+    ).style.display = "block";
+}
+
+
+/* =========================
+   ACTUALIZAR
+========================= */
+
+async function actualizar() {
 
     const nombre =
-        document.getElementById("nombre").value.trim();
+        document.getElementById(
+            "editarNombre"
+        ).value;
 
     const marca =
-        document.getElementById("marca").value.trim();
+        document.getElementById(
+            "editarMarca"
+        ).value;
 
     const cantidad =
-        document.getElementById("cantidad").value.trim();
+        document.getElementById(
+            "editarCantidad"
+        ).value;
 
     const bodega =
-        document.getElementById("bodega").value.trim();
+        document.getElementById(
+            "editarBodega"
+        ).value;
 
 
-    if (
-        !validar(
-            nombre,
-            marca,
-            cantidad,
-            bodega
-        )
-    ) {
-        return;
-    }
+    await fetch(
+        `${API_URL}?id=${editandoId}`,
+        {
 
-    try {
-
-        const response = await fetch(API_URL, {
-
-            method: "POST",
+            method: "PUT",
 
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type":
+                    "application/json"
             },
 
             body: JSON.stringify({
@@ -170,164 +243,23 @@ async function crear() {
 
                 bodega: bodega
             })
-        });
-
-        const data = await response.json();
-
-        console.log(data);
-
-        if (data.error) {
-
-            mostrarMensaje(data.error);
-
-            return;
         }
+    );
 
-        mostrarMensaje(
-            "Artículo creado correctamente",
-            "green"
-        );
+    mostrarMensaje(
+        "Artículo actualizado",
+        "green"
+    );
 
-        limpiar();
+    cancelarEdicion();
 
-        cargar();
-
-    } catch (error) {
-
-        console.log(error);
-
-        mostrarMensaje(
-            "Error al crear artículo"
-        );
-    }
+    cargar();
 }
 
 
-/* =====================================
-   EDITAR ARTÍCULO
-===================================== */
-
-async function editar(id) {
-
-    try {
-
-        const response =
-            await fetch(`${API_URL}?id=${id}`);
-
-        const a = await response.json();
-
-        document.getElementById(
-            "editarNombre"
-        ).value = a.nombre;
-
-        document.getElementById(
-            "editarMarca"
-        ).value = a.marca;
-
-        document.getElementById(
-            "editarCantidad"
-        ).value = a.cantidad;
-
-        document.getElementById(
-            "editarBodega"
-        ).value = a.bodega;
-
-        editandoId = id;
-
-        document.getElementById(
-            "seccionEditar"
-        ).style.display = "block";
-
-    } catch (error) {
-
-        console.log(error);
-
-        mostrarMensaje(
-            "Error al cargar artículo"
-        );
-    }
-}
-
-
-/* =====================================
-   ACTUALIZAR
-===================================== */
-
-async function actualizar() {
-
-    const nombre =
-        document.getElementById(
-            "editarNombre"
-        ).value.trim();
-
-    const marca =
-        document.getElementById(
-            "editarMarca"
-        ).value.trim();
-
-    const cantidad =
-        document.getElementById(
-            "editarCantidad"
-        ).value.trim();
-
-    const bodega =
-        document.getElementById(
-            "editarBodega"
-        ).value.trim();
-
-
-    try {
-
-        const response = await fetch(
-            `${API_URL}?id=${editandoId}`,
-            {
-
-                method: "PUT",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    nombre: nombre,
-
-                    marca: marca,
-
-                    cantidad: parseInt(cantidad),
-
-                    bodega: bodega
-                })
-            }
-        );
-
-        const data = await response.json();
-
-        console.log(data);
-
-        mostrarMensaje(
-            "Artículo actualizado",
-            "green"
-        );
-
-        cancelarEdicion();
-
-        cargar();
-
-    } catch (error) {
-
-        console.log(error);
-
-        mostrarMensaje(
-            "Error al actualizar"
-        );
-    }
-}
-
-
-/* =====================================
-   CANCELAR EDICIÓN
-===================================== */
+/* =========================
+   CANCELAR
+========================= */
 
 function cancelarEdicion() {
 
@@ -339,53 +271,30 @@ function cancelarEdicion() {
 }
 
 
-/* =====================================
+/* =========================
    ELIMINAR
-===================================== */
+========================= */
 
 async function eliminar(id) {
 
-    if (
-        !confirm(
-            "¿Eliminar artículo?"
-        )
-    ) {
-        return;
-    }
+    await fetch(
+        `${API_URL}?id=${id}`,
+        {
+            method: "DELETE"
+        }
+    );
 
-    try {
+    mostrarMensaje(
+        "Artículo eliminado",
+        "green"
+    );
 
-        const response = await fetch(
-            `${API_URL}?id=${id}`,
-            {
-                method: "DELETE"
-            }
-        );
-
-        const data = await response.json();
-
-        console.log(data);
-
-        mostrarMensaje(
-            "Artículo eliminado",
-            "green"
-        );
-
-        cargar();
-
-    } catch (error) {
-
-        console.log(error);
-
-        mostrarMensaje(
-            "Error al eliminar"
-        );
-    }
+    cargar();
 }
 
 
-/* =====================================
-   INICIAR APP
-===================================== */
+/* =========================
+   INICIO
+========================= */
 
 cargar();
